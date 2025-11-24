@@ -1,4 +1,7 @@
 package SPAC.MealFlow.config;
 
-public class Webconfig {
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+public class WebConfig {
 }
