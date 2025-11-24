@@ -1,5 +1,7 @@
-package SPAC.MealFlow.model;
+package SPAC.MealFlow.user.model;
 
+import SPAC.MealFlow.mealplan.model.MealPlans;
+import SPAC.MealFlow.recipe.model.Recipe;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;

@@ -1,5 +1,6 @@
-package SPAC.MealFlow.model;
+package SPAC.MealFlow.mealplan.model;
 
+import SPAC.MealFlow.recipe.model.Ingredients;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,4 +1,4 @@
-package SPAC.MealFlow.model;
+package SPAC.MealFlow.recipe.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

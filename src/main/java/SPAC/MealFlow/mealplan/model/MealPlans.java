@@ -1,5 +1,6 @@
-package SPAC.MealFlow.model;
+package SPAC.MealFlow.mealplan.model;
 
+import SPAC.MealFlow.user.model.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,7 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -20,31 +20,24 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Recipe {
+public class MealPlans {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // owner of this recipe
+    // owner of this meal plan
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String title;
-    private String description;
-    private String instructions;
-    private int servings;
-    private int prepTime; // minutes
+    private String name;
 
-    private Date createdAt;
-    private Date updatedAt;
+    // all entries (days/meals) in this plan
+    @OneToMany(mappedBy = "mealPlan")
+    private List<MealPlanEntries> entries;
 
-    // ingredients for this recipe
-    @OneToMany(mappedBy = "recipe")
-    private List<RecipeIngredients> recipeIngredients;
-
-    // meal plan entries that use this recipe
-    @OneToMany(mappedBy = "recipe")
-    private List<MealPlanEntries> mealPlanEntries;
+    // all shopping list items generated from this plan
+    @OneToMany(mappedBy = "mealPlan")
+    private List<ShoppingListItems> shoppingListItems;
 }
