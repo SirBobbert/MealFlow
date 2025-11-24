@@ -2,13 +2,7 @@ package SPAC.MealFlow.user.model;
 
 import SPAC.MealFlow.mealplan.model.MealPlans;
 import SPAC.MealFlow.recipe.model.Recipe;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(
+        name = "user",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_email", columnNames = "email")
+        }
+)
 public class User {
 
     @Id
@@ -29,6 +29,7 @@ public class User {
     private int id;
 
     private String name;
+    @Column(nullable = false, unique = true)
     private String email;
 
     // store hashed password here

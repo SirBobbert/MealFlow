@@ -1,7 +1,13 @@
 package SPAC.MealFlow.user.controller;
 
 import SPAC.MealFlow.common.dto.ErrorResponseDTO;
-import SPAC.MealFlow.user.dto.*;
+import SPAC.MealFlow.common.exceptions.UserAlreadyExistsException;
+import SPAC.MealFlow.security.CustomUserDetails;
+import SPAC.MealFlow.security.JwtService;
+import SPAC.MealFlow.user.dto.LoginRequestDTO;
+import SPAC.MealFlow.user.dto.LoginResponseDTO;
+import SPAC.MealFlow.user.dto.UserCreateRequestDTO;
+import SPAC.MealFlow.user.dto.UserResponseDTO;
 import SPAC.MealFlow.user.model.User;
 import SPAC.MealFlow.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +25,16 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private final JwtService jwtService;
+
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(JwtService jwtService,
+                          UserService userService) {
+        this.jwtService = jwtService;
         this.userService = userService;
     }
-
-    // Controller only maps DTO -> entity and entity -> DTO
-    // Password hashing should be done in the service layer
 
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody UserCreateRequestDTO request) {
@@ -40,19 +47,32 @@ public class UserController {
                 .createdAt(new Date())
                 .build();
 
-        User created = userService.createUser(user);
+        try {
+            User created = userService.createUser(user);
 
-        UserResponseDTO response = new UserResponseDTO(
-                created.getId(),
-                created.getName(),
-                created.getEmail(),
-                created.getRole().name(),
-                created.getCreatedAt()
-        );
+            UserResponseDTO response = new UserResponseDTO(
+                    created.getId(),
+                    created.getName(),
+                    created.getEmail(),
+                    created.getRole().name(),
+                    created.getCreatedAt()
+            );
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(response);
+
+        } catch (UserAlreadyExistsException ex) {
+
+            ErrorResponseDTO error = new ErrorResponseDTO(
+                    HttpStatus.CONFLICT.value(),
+                    ex.getMessage()
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(error);
+        }
     }
 
     @PostMapping("/login")
@@ -61,7 +81,6 @@ public class UserController {
         Optional<User> userOpt = userService.authenticate(request.email(), request.password());
 
         if (userOpt.isEmpty()) {
-
             ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                     HttpStatus.UNAUTHORIZED.value(),
                     "Invalid email or password"
@@ -74,10 +93,14 @@ public class UserController {
 
         User user = userOpt.get();
 
+        CustomUserDetails principal = new CustomUserDetails(user);
+        String token = jwtService.generateToken(principal);
+
         LoginResponseDTO response = new LoginResponseDTO(
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                token
         );
 
         return ResponseEntity.ok(response);

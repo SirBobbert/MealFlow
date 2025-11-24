@@ -1,5 +1,6 @@
 package SPAC.MealFlow.user.service;
 
+import SPAC.MealFlow.common.exceptions.UserAlreadyExistsException;
 import SPAC.MealFlow.user.model.User;
 import SPAC.MealFlow.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,21 @@ public class UserService {
         this.encoder = encoder;
     }
 
-    // create user with encoded password
+    // create user with encoded password and unique email
     public User createUser(User user) {
+
+        // check if email already exists
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("User with email " + user.getEmail() + " already exists");
+        }
+
+        // encode password before saving
         user.setPassword(encoder.encode(user.getPassword()));
+
         return userRepository.save(user);
     }
 
-    // login/authenticate
     public Optional<User> authenticate(String email, String rawPassword) {
-
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isEmpty()) {
@@ -47,8 +54,11 @@ public class UserService {
         return Optional.of(user);
     }
 
-    // find user by id
     public Optional<User> findById(int id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

@@ -4,14 +4,18 @@ import SPAC.MealFlow.recipe.dto.RecipeCreateRequestDTO;
 import SPAC.MealFlow.recipe.model.Recipe;
 import SPAC.MealFlow.recipe.service.RecipeService;
 import SPAC.MealFlow.recipe.dto.RecipeResponseDTO;
+import SPAC.MealFlow.security.CustomUserDetails;
 import SPAC.MealFlow.user.model.User;
 import SPAC.MealFlow.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.Authenticator;
 import java.util.Date;
 
 @RestController
@@ -32,12 +36,12 @@ public class RecipeController {
     @PostMapping("/create")
     public ResponseEntity<?> createRecipe(@PathVariable int userId, @RequestBody RecipeCreateRequestDTO request) {
 
-        // find owner from DB
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails principal = (CustomUserDetails) auth.getPrincipal();
+        User currentUser = principal.getUser();
 
         Recipe recipe = Recipe.builder()
-                .user(user)
+                .user(currentUser)
                 .title(request.title())
                 .description(request.description())
                 .instructions(request.instructions())
