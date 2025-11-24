@@ -1,4 +1,4 @@
-package SPAC.fullstack.model;
+package SPAC.MealFlow.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Owner of this recipe
+    // owner of this recipe
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -40,11 +40,11 @@ public class Recipe {
     private Date createdAt;
     private Date updatedAt;
 
-    // Ingredients for this recipe
+    // ingredients for this recipe
     @OneToMany(mappedBy = "recipe")
     private List<RecipeIngredients> recipeIngredients;
 
-    // Meal plan entries that use this recipe
+    // meal plan entries that use this recipe
     @OneToMany(mappedBy = "recipe")
     private List<MealPlanEntries> mealPlanEntries;
 }

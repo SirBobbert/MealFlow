@@ -1,4 +1,4 @@
-package SPAC.fullstack.model;
+package SPAC.MealFlow.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -26,23 +26,23 @@ public class MealPlanEntries {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Meal plan this entry belongs to
+    // meal plan this entry belongs to
     @ManyToOne
     @JoinColumn(name = "meal_plan_id")
     private MealPlans mealPlan;
 
-    // Recipe used for this entry
+    // recipe used for this entry
     @ManyToOne
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
     private Date createdAt;
 
-    // Type of meal
+    // type of meal
     @Enumerated(EnumType.STRING)
     private MealType mealType;
 
-    // Override servings for this entry, if needed
+    // override servings for this entry, if needed
     private int servingsOverride;
 
     public enum MealType {

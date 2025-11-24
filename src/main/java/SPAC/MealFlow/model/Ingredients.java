@@ -1,4 +1,4 @@
-package SPAC.fullstack.model;
+package SPAC.MealFlow.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -20,34 +19,33 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class User {
+public class Ingredients {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
-    private String email;
 
-    // Store hashed password here
-    private String password;
-
-    private Date createdAt;
-
-    // Role for this user
+    // category for this ingredient
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Category category;
 
-    // All recipes owned by this user
-    @OneToMany(mappedBy = "user")
-    private List<Recipe> recipes;
+    // links to recipes that use this ingredient
+    @OneToMany(mappedBy = "ingredient")
+    private List<RecipeIngredients> recipeIngredients;
 
-    // All meal plans owned by this user
-    @OneToMany(mappedBy = "user")
-    private List<MealPlans> mealPlans;
+    // links to shopping list items using this ingredient
+    @OneToMany(mappedBy = "ingredient")
+    private List<ShoppingListItems> shoppingListItems;
 
-    public enum Role {
-        ADMIN,
-        USER
+    public enum Category {
+        VEGETABLE,
+        FRUIT,
+        GRAIN,
+        PROTEIN,
+        DAIRY,
+        SPICE,
+        OTHER
     }
 }

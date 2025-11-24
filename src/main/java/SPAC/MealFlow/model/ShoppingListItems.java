@@ -1,4 +1,4 @@
-package SPAC.fullstack.model;
+package SPAC.MealFlow.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,12 +22,12 @@ public class ShoppingListItems {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Meal plan this item belongs to
+    // meal plan this item belongs to
     @ManyToOne
     @JoinColumn(name = "meal_plan_id")
     private MealPlans mealPlan;
 
-    // Ingredient on this shopping list line
+    // ingredient on this shopping list line
     @ManyToOne
     @JoinColumn(name = "ingredient_id")
     private Ingredients ingredient;

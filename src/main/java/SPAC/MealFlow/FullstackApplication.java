@@ -1,4 +1,4 @@
-package SPAC.fullstack;
+package SPAC.MealFlow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

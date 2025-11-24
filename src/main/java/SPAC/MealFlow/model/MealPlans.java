@@ -1,4 +1,4 @@
-package SPAC.fullstack.model;
+package SPAC.MealFlow.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,18 +25,18 @@ public class MealPlans {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    // Owner of this meal plan
+    // owner of this meal plan
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     private String name;
 
-    // All entries (days/meals) in this plan
+    // all entries (days/meals) in this plan
     @OneToMany(mappedBy = "mealPlan")
     private List<MealPlanEntries> entries;
 
-    // All shopping list items generated from this plan
+    // all shopping list items generated from this plan
     @OneToMany(mappedBy = "mealPlan")
     private List<ShoppingListItems> shoppingListItems;
 }
