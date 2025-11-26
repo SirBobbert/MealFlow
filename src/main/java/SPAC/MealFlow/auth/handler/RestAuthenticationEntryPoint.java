@@ -1,4 +1,3 @@
-// src/main/java/SPAC/MealFlow/security/CustomAuthenticationEntryPoint.java
 package SPAC.MealFlow.auth.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        // Debug log so you can see if this is hit
+        // debug log
         System.out.println(">>> CustomAuthenticationEntryPoint called");
 
         ErrorResponseDTO body = new ErrorResponseDTO(
@@ -33,13 +32,9 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 Instant.now()
         );
 
-        // Set status code
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // Set content type
         response.setContentType("application/json");
-        // Set charset
         response.setCharacterEncoding("UTF-8");
-        // Write body
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 }

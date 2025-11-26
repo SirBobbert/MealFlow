@@ -40,12 +40,4 @@ public class UserService {
 
         return user;
     }
-
-    public Optional<User> findById(int id) {
-        return userRepository.findById(id);
-    }
-
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
 }

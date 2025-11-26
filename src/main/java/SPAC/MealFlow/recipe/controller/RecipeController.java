@@ -31,16 +31,15 @@ public class RecipeController {
         this.ingredientService = ingredientService;
     }
 
-
     @PostMapping
-    public ResponseEntity<CreateRecipeResponseDTO> createRecipe(@RequestBody CreateRecipeRequestDTO request) {
+    public ResponseEntity<?> createRecipe(@RequestBody CreateRecipeRequestDTO request) {
 
-        // Get current authenticated user
+        // get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
 
-        // Build base recipe (without ingredients first)
+        // build base recipe
         Recipe recipe = Recipe.builder()
                 .user(currentUser)
                 .title(request.title())
@@ -51,13 +50,13 @@ public class RecipeController {
                 .createdAt(new Date())
                 .build();
 
-        // Map DTO ingredients -> RecipeIngredient entities
+        // map DTO ingredients
         List<RecipeIngredient> recipeIngredients = request.ingredients().stream()
                 .map(ingDto -> {
-                    // Get existing Ingredient by id
+
+                    // get existing Ingredient by id
                     Ingredient ingredient = ingredientService.getById(ingDto.ingredientId());
 
-                    // Build join entity
                     return RecipeIngredient.builder()
                             .recipe(recipe)
                             .ingredient(ingredient)
@@ -67,13 +66,11 @@ public class RecipeController {
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        // Attach to recipe
         recipe.setRecipeIngredients(recipeIngredients);
 
-        // Persist
         Recipe created = recipeService.createRecipe(recipe);
 
-        // Map entity -> response DTO
+        // map entity to response DTO
         List<CreateRecipeIngredientResponseDTO> ingredientResponses = created.getRecipeIngredients().stream()
                 .map(ri -> new CreateRecipeIngredientResponseDTO(
                         ri.getIngredient().getId(),
@@ -101,7 +98,7 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetSingleRecipeResponseDTO> getRecipeById(@PathVariable int id) {
+    public ResponseEntity<?> getRecipeById(@PathVariable int id) {
 
         GetSingleRecipeResponseDTO recipe = recipeService.getRecipeById(id);
 
@@ -120,9 +117,9 @@ public class RecipeController {
     }
 
     @GetMapping
-    public ResponseEntity<GetAllRecipesResponseDTO> getAllRecipes() {
+    public ResponseEntity<?> getAllRecipes() {
 
-        // Get current authenticated user
+        // get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
@@ -139,7 +136,7 @@ public class RecipeController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CreateRecipeResponseDTO> updateRecipe(
+    public ResponseEntity<?> updateRecipe(
             @PathVariable int id,
             @RequestBody CreateRecipeRequestDTO request) {
 
@@ -157,7 +154,7 @@ public class RecipeController {
                                 ri.getAmount(),
                                 ri.getUnit()
                         ))
-                        .toList(); // this is fine, it's DTOs, not attached to JPA
+                        .toList(); 
 
         CreateRecipeResponseDTO response = new CreateRecipeResponseDTO(
                 updated.getId(),
@@ -177,7 +174,7 @@ public class RecipeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<DeleteRecipeResponseDTO> deleteRecipe(@PathVariable int id) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable int id) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();

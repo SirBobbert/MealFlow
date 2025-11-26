@@ -48,16 +48,15 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
-    // Service
     public GetSingleRecipeResponseDTO getRecipeById(int id) {
 
-        // Load entity or throw 404-style exception
+        // load entity
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() ->
                         new RecipeNotFoundException("Recipe with ID " + id + " not found")
                 );
 
-        // Map entity -> response DTO
+        // map entity to response DTO
         return new GetSingleRecipeResponseDTO(
                 recipe.getId(),
                 recipe.getTitle(),
@@ -71,7 +70,7 @@ public class RecipeService {
 
     public List<GetAllRecipesRequestDTO> getAllUserRecipes(int userId) {
 
-        // load all Recipe entities for this user
+        // load all recipe entities for this user
         List<Recipe> recipes = recipeRepository.findAllByUserId(userId);
 
         // map entities to DTOs
@@ -91,32 +90,30 @@ public class RecipeService {
     @Transactional
     public Recipe updateRecipe(int id, User currentUser, CreateRecipeRequestDTO request) {
 
-        // Load existing recipe
+        // oad existing recipe
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
-        // Optional: security check - only owner can update
+        // only owner can update
         if (recipe.getUser().getId() != currentUser.getId()) {
             throw new RecipeNotFoundException("Recipe with ID " + id + " not found for this user");
         }
 
-        // Update scalar fields
         recipe.setTitle(request.title());
         recipe.setDescription(request.description());
         recipe.setInstructions(request.instructions());
         recipe.setServings(request.servings());
         recipe.setPrepTime(request.prepTime());
 
-        // Clear current ingredients (this list MUST be mutable)
         recipe.getRecipeIngredients().clear();
 
-        // Rebuild ingredients
+        // rebuild ingredients
         List<RecipeIngredient> newIngredients = request.ingredients().stream()
                 .map(ingDto -> {
                     Ingredient ingredient = ingredientRepository.getById(ingDto.ingredientId());
 
                     return RecipeIngredient.builder()
-                            .recipe(recipe)                 // link back to recipe
+                            .recipe(recipe)
                             .ingredient(ingredient)
                             .amount(ingDto.amount())
                             .unit(ingDto.unit())
@@ -124,10 +121,9 @@ public class RecipeService {
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        // Attach new ingredients
+        // attach new ingredients
         recipe.getRecipeIngredients().addAll(newIngredients);
 
-        // Persist
         return recipeRepository.save(recipe);
     }
 
@@ -145,6 +141,4 @@ public class RecipeService {
         recipeRepository.delete(recipe);
         return recipe;
     }
-
-
 }

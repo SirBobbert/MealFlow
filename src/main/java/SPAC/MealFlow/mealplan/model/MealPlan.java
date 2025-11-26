@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class MealPlans {
+public class MealPlan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,4 +1,3 @@
-// src/main/java/SPAC/MealFlow/security/CustomAccessDeniedHandler.java
 package SPAC.MealFlow.auth.handler;
 
 import jakarta.servlet.http.HttpServletRequest;

@@ -26,7 +26,7 @@ public class ShoppingListItems {
     // meal plan this item belongs to
     @ManyToOne
     @JoinColumn(name = "meal_plan_id")
-    private MealPlans mealPlan;
+    private MealPlan mealPlan;
 
     // ingredient on this shopping list line
     @ManyToOne

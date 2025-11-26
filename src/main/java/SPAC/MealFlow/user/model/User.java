@@ -1,6 +1,6 @@
 package SPAC.MealFlow.user.model;
 
-import SPAC.MealFlow.mealplan.model.MealPlans;
+import SPAC.MealFlow.mealplan.model.MealPlan;
 import SPAC.MealFlow.recipe.model.Recipe;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,7 +47,7 @@ public class User {
 
     // all meal plans owned by this user
     @OneToMany(mappedBy = "user")
-    private List<MealPlans> mealPlans;
+    private List<MealPlan> mealPlans;
 
     public enum Role {
         ADMIN,

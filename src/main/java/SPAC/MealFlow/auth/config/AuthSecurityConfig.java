@@ -18,16 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class AuthSecurityConfig {
 
-    // Filter that reads JWT from Authorization header and sets SecurityContext
     private final JwtAuthFilter jwtAuthFilter;
-
-    // Service used by JwtAuthFilter to load user details from DB
     private final AuthUserDetailsService userDetailsService;
-
-    // Custom entry point for 401 Unauthorized responses
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
-    // Custom handler for 403 Forbidden responses
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
     public AuthSecurityConfig(

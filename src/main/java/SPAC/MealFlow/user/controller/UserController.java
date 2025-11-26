@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserCreateRequestDTO request) {
+    public ResponseEntity<?> createUser(@RequestBody UserCreateRequestDTO request) {
 
         User user = User.builder()
                 .name(request.name())
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
 
         User user = userService.authenticateOrThrow(request.email(), request.password());
         String token = jwtService.generateToken(new AuthUserDetails(user));

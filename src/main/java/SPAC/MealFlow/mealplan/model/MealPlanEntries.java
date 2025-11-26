@@ -30,7 +30,7 @@ public class MealPlanEntries {
     // meal plan this entry belongs to
     @ManyToOne
     @JoinColumn(name = "meal_plan_id")
-    private MealPlans mealPlan;
+    private MealPlan mealPlan;
 
     // recipe used for this entry
     @ManyToOne
