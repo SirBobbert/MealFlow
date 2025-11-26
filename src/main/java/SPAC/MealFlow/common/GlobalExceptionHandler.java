@@ -70,7 +70,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneric(
             Exception ex, HttpServletRequest req) {
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error",
-                "Something went wrong", req.getRequestURI());
+
+        // Log full stack trace so you can see what actually broke
+        ex.printStackTrace();
+
+        // Option 1: expose the real message while debugging
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Internal server error",
+                ex.getMessage(),               // temporary, for debugging
+                req.getRequestURI()
+        );
+
+        // Option 2 (prod): keep generic message, but still log above
+        // return buildError(
+        //         HttpStatus.INTERNAL_SERVER_ERROR,
+        //         "Internal server error",
+        //         "Something went wrong",
+        //         req.getRequestURI()
+        // );
     }
 }

@@ -2,22 +2,17 @@ package SPAC.MealFlow.auth.config;
 
 import SPAC.MealFlow.auth.handler.RestAccessDeniedHandler;
 import SPAC.MealFlow.auth.handler.RestAuthenticationEntryPoint;
-import SPAC.MealFlow.auth.user.AuthUserDetailsService;
 import SPAC.MealFlow.auth.jwt.JwtAuthFilter;
+import SPAC.MealFlow.auth.user.AuthUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// Import for HttpSecurity configuration
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-// Import for disabling CSRF with lambda
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-// Import for stateless session policy
 import org.springframework.security.config.http.SessionCreationPolicy;
-// Import for password encoder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-// Import for filter chain
 import org.springframework.security.web.SecurityFilterChain;
-// Import to register JWT filter before username/password auth
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -26,7 +21,7 @@ public class AuthSecurityConfig {
     // Filter that reads JWT from Authorization header and sets SecurityContext
     private final JwtAuthFilter jwtAuthFilter;
 
-    // Service used by JwtAuthenticationFilter to load user details from DB
+    // Service used by JwtAuthFilter to load user details from DB
     private final AuthUserDetailsService userDetailsService;
 
     // Custom entry point for 401 Unauthorized responses
@@ -35,10 +30,12 @@ public class AuthSecurityConfig {
     // Custom handler for 403 Forbidden responses
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
-    public AuthSecurityConfig(JwtAuthFilter jwtAuthFilter,
-                              AuthUserDetailsService userDetailsService,
-                              RestAuthenticationEntryPoint restAuthenticationEntryPoint,
-                              RestAccessDeniedHandler restAccessDeniedHandler) {
+    public AuthSecurityConfig(
+            JwtAuthFilter jwtAuthFilter,
+            AuthUserDetailsService userDetailsService,
+            RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+            RestAccessDeniedHandler restAccessDeniedHandler
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
@@ -47,6 +44,7 @@ public class AuthSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         // Disable CSRF for token based API
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -57,7 +55,23 @@ public class AuthSecurityConfig {
 
         // Configure which endpoints are public and which require auth
         http.authorizeHttpRequests(auth -> auth
+                // Auth endpoints (login etc.) public
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+
+                // User registration or similar public
                 .requestMatchers("/api/users/**").permitAll()
+
+                // Recipe endpoints protected
+                .requestMatchers(HttpMethod.GET, "/api/recipes/**")
+                .hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/recipes/**")
+                .hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/recipes/**")
+                .hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/recipes/**")
+                .hasAnyRole("USER", "ADMIN")
+
+                // Everything else requires authentication
                 .anyRequest().authenticated()
         );
 
@@ -75,6 +89,7 @@ public class AuthSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         // Password encoder used when creating users and checking passwords
         return new BCryptPasswordEncoder();
     }

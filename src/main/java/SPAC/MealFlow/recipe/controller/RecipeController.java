@@ -14,8 +14,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/recipes")
@@ -63,7 +65,7 @@ public class RecipeController {
                             .unit(ingDto.unit())
                             .build();
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
 
         // Attach to recipe
         recipe.setRecipeIngredients(recipeIngredients);
@@ -101,6 +103,7 @@ public class RecipeController {
     @GetMapping
     public ResponseEntity<GetAllRecipesResponseDTO> getAllRecipes() {
 
+        // Get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
@@ -114,5 +117,48 @@ public class RecipeController {
                 .status(HttpStatus.OK)
                 .body(response);
     }
+
+
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<CreateRecipeResponseDTO> updateRecipe(
+            @PathVariable int id,
+            @RequestBody RecipeCreateRequestDTO request) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
+        User currentUser = principal.getUser();
+
+        System.out.println(">>> updateRecipe called with id = " + id);
+
+        Recipe updated = recipeService.updateRecipe(id, currentUser, request);
+
+        List<CreateRecipeIngredientResponseDTO> ingredientResponses =
+                updated.getRecipeIngredients().stream()
+                        .map(ri -> new CreateRecipeIngredientResponseDTO(
+                                ri.getIngredient().getId(),
+                                ri.getIngredient().getName(),
+                                ri.getAmount(),
+                                ri.getUnit()
+                        ))
+                        .toList(); // this is fine, it's DTOs, not attached to JPA
+
+        CreateRecipeResponseDTO response = new CreateRecipeResponseDTO(
+                updated.getId(),
+                updated.getUser().getId(),
+                updated.getTitle(),
+                updated.getDescription(),
+                updated.getInstructions(),
+                updated.getServings(),
+                updated.getPrepTime(),
+                updated.getCreatedAt(),
+                ingredientResponses
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
 }
