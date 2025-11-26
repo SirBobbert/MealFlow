@@ -11,8 +11,5 @@ public record RecipeCreateRequestDTO(
         int servings,
         int prepTime,
         List<RecipeIngredientCreateRequestDTO> ingredients
-
-        // TODO:
-        // Add mealplan entries (look in Recipe.java class)
 ) {
 }

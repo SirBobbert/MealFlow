@@ -3,7 +3,7 @@ package SPAC.MealFlow.recipe.dto;
 import java.util.Date;
 import java.util.List;
 
-public record RecipeResponseDTO(
+public record CreateRecipeResponseDTO(
         int id,
         int userId,
         String title,
@@ -12,6 +12,6 @@ public record RecipeResponseDTO(
         int servings,
         int prepTime,
         Date createdAt,
-        List<RecipeIngredientResponseDTO> ingredients
+        List<CreateRecipeIngredientResponseDTO> ingredients
 ) {
 }

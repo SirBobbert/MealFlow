@@ -1,8 +1,6 @@
 package SPAC.MealFlow.recipe.controller;
 
-import SPAC.MealFlow.recipe.dto.RecipeCreateRequestDTO;
-import SPAC.MealFlow.recipe.dto.RecipeIngredientResponseDTO;
-import SPAC.MealFlow.recipe.dto.RecipeResponseDTO;
+import SPAC.MealFlow.recipe.dto.*;
 import SPAC.MealFlow.recipe.model.Ingredient;
 import SPAC.MealFlow.recipe.model.Recipe;
 import SPAC.MealFlow.recipe.model.RecipeIngredient;
@@ -33,7 +31,7 @@ public class RecipeController {
 
 
     @PostMapping
-    public ResponseEntity<RecipeResponseDTO> createRecipe(@RequestBody RecipeCreateRequestDTO request) {
+    public ResponseEntity<CreateRecipeResponseDTO> createRecipe(@RequestBody RecipeCreateRequestDTO request) {
 
         // Get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -74,8 +72,8 @@ public class RecipeController {
         Recipe created = recipeService.createRecipe(recipe);
 
         // Map entity -> response DTO
-        List<RecipeIngredientResponseDTO> ingredientResponses = created.getRecipeIngredients().stream()
-                .map(ri -> new RecipeIngredientResponseDTO(
+        List<CreateRecipeIngredientResponseDTO> ingredientResponses = created.getRecipeIngredients().stream()
+                .map(ri -> new CreateRecipeIngredientResponseDTO(
                         ri.getIngredient().getId(),
                         ri.getIngredient().getName(),
                         ri.getAmount(),
@@ -83,7 +81,7 @@ public class RecipeController {
                 ))
                 .toList();
 
-        RecipeResponseDTO response = new RecipeResponseDTO(
+        CreateRecipeResponseDTO response = new CreateRecipeResponseDTO(
                 created.getId(),
                 created.getUser().getId(),
                 created.getTitle(),
@@ -97,6 +95,23 @@ public class RecipeController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
+                .body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<GetAllRecipesResponseDTO> getAllRecipes() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
+        User currentUser = principal.getUser();
+
+        List<GetAllRecipesRecipeDTO> recipes =
+                recipeService.getAllUserRecipes(currentUser.getId());
+
+        GetAllRecipesResponseDTO response = new GetAllRecipesResponseDTO(recipes);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .body(response);
     }
 
