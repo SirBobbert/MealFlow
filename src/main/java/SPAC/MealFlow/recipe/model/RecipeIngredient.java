@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class RecipeIngredients {
+public class RecipeIngredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class RecipeIngredients {
     // ingredient used in the recipe
     @ManyToOne
     @JoinColumn(name = "ingredient_id")
-    private Ingredients ingredient;
+    private Ingredient ingredient;
 
     private int amount;
     private String unit;

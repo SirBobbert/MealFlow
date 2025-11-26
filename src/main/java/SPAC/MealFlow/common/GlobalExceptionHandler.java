@@ -1,6 +1,7 @@
 package SPAC.MealFlow.common;
 
 import SPAC.MealFlow.common.dto.ErrorResponseDTO;
+import SPAC.MealFlow.common.exceptions.IngredientNotFoundException;
 import SPAC.MealFlow.common.exceptions.InvalidCredentialsException;
 import SPAC.MealFlow.common.exceptions.RecipeNotFoundException;
 import SPAC.MealFlow.common.exceptions.UserAlreadyExistsException;
@@ -28,6 +29,13 @@ public class GlobalExceptionHandler {
                         Instant.now()
                 )
         );
+    }
+
+    @ExceptionHandler(IngredientNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIngredientExist(
+            IngredientNotFoundException ex, HttpServletRequest req) {
+        return buildError(HttpStatus.NOT_FOUND, "Ingredient doesn't exist",
+                ex.getMessage(), req.getRequestURI());
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

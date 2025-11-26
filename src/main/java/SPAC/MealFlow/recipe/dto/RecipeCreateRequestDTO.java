@@ -1,6 +1,6 @@
 package SPAC.MealFlow.recipe.dto;
 
-import SPAC.MealFlow.recipe.model.RecipeIngredients;
+import SPAC.MealFlow.recipe.model.RecipeIngredient;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record RecipeCreateRequestDTO(
         String instructions,
         int servings,
         int prepTime,
-        List<RecipeIngredients> listOfIngredients
+        List<RecipeIngredientCreateRequestDTO> ingredients
 
         // TODO:
         // Add mealplan entries (look in Recipe.java class)

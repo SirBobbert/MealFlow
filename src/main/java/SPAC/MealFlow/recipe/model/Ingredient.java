@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Ingredients {
+public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class Ingredients {
 
     // links to recipes that use this ingredient
     @OneToMany(mappedBy = "ingredient")
-    private List<RecipeIngredients> recipeIngredients;
+    private List<RecipeIngredient> recipeIngredients;
 
     // links to shopping list items using this ingredient
     @OneToMany(mappedBy = "ingredient")

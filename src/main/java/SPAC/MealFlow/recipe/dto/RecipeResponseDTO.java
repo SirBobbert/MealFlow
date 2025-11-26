@@ -1,7 +1,5 @@
 package SPAC.MealFlow.recipe.dto;
 
-import SPAC.MealFlow.recipe.model.RecipeIngredients;
-
 import java.util.Date;
 import java.util.List;
 
@@ -14,5 +12,6 @@ public record RecipeResponseDTO(
         int servings,
         int prepTime,
         Date createdAt,
-        List<RecipeIngredients> listOfIngredients
-) { }
+        List<RecipeIngredientResponseDTO> ingredients
+) {
+}

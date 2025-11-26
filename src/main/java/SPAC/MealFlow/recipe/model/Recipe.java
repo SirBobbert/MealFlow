@@ -2,18 +2,13 @@ package SPAC.MealFlow.recipe.model;
 
 import SPAC.MealFlow.mealplan.model.MealPlanEntries;
 import SPAC.MealFlow.user.model.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,8 +38,12 @@ public class Recipe {
     private Date updatedAt;
 
     // ingredients for this recipe
-    @OneToMany(mappedBy = "recipe")
-    private List<RecipeIngredients> recipeIngredients;
+    @OneToMany(
+            mappedBy = "recipe",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 
     // meal plan entries that use this recipe
     @OneToMany(mappedBy = "recipe")

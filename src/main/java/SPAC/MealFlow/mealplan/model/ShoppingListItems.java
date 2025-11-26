@@ -1,6 +1,6 @@
 package SPAC.MealFlow.mealplan.model;
 
-import SPAC.MealFlow.recipe.model.Ingredients;
+import SPAC.MealFlow.recipe.model.Ingredient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +31,7 @@ public class ShoppingListItems {
     // ingredient on this shopping list line
     @ManyToOne
     @JoinColumn(name = "ingredient_id")
-    private Ingredients ingredient;
+    private Ingredient ingredient;
 
     private int amount;
     private String unit;
