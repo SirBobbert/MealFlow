@@ -1,4 +1,4 @@
-package SPAC.MealFlow.security;
+package SPAC.MealFlow.auth.user;
 
 import SPAC.MealFlow.user.model.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,12 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class CustomUserDetails implements UserDetails {
+public class AuthUserDetails implements UserDetails {
 
     // Underlying User entity
     private final User user;
 
-    public CustomUserDetails(User user) {
+    public AuthUserDetails(User user) {
         this.user = user;
     }
 

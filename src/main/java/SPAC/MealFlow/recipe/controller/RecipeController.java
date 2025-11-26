@@ -1,45 +1,38 @@
 package SPAC.MealFlow.recipe.controller;
 
 import SPAC.MealFlow.recipe.dto.RecipeCreateRequestDTO;
+import SPAC.MealFlow.recipe.dto.RecipeResponseDTO;
 import SPAC.MealFlow.recipe.model.Recipe;
 import SPAC.MealFlow.recipe.service.RecipeService;
-import SPAC.MealFlow.recipe.dto.RecipeResponseDTO;
-import SPAC.MealFlow.security.CustomUserDetails;
+import SPAC.MealFlow.auth.user.AuthUserDetails;
 import SPAC.MealFlow.user.model.User;
-import SPAC.MealFlow.user.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.Authenticator;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/api/users/{userId}/recipes")
+@RequestMapping("/api/recipes")
 public class RecipeController {
 
     private final RecipeService recipeService;
 
-    private final UserService userService;
-
-
-    @Autowired
-    public RecipeController(RecipeService recipeService, UserService userService) {
+    public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
-        this.userService = userService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createRecipe(@PathVariable int userId, @RequestBody RecipeCreateRequestDTO request) {
+    @PostMapping
+    public ResponseEntity<RecipeResponseDTO> createRecipe(@RequestBody RecipeCreateRequestDTO request) {
 
+        // Get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails principal = (CustomUserDetails) auth.getPrincipal();
+        AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
 
+        // Build entity from DTO + current user
         Recipe recipe = Recipe.builder()
                 .user(currentUser)
                 .title(request.title())
@@ -69,6 +62,4 @@ public class RecipeController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
-
-
 }

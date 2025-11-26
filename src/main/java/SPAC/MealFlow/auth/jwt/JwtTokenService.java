@@ -1,4 +1,4 @@
-package SPAC.MealFlow.security;
+package SPAC.MealFlow.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class JwtTokenService {
 
     // Secret key for signing JWT - move to config/env in real app
     private final Key secretKey = Keys.hmacShaKeyFor(

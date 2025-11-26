@@ -1,5 +1,6 @@
-package SPAC.MealFlow.security;
+package SPAC.MealFlow.auth.jwt;
 
+import SPAC.MealFlow.auth.user.AuthUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,16 +15,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     // Service for parsing and validating JWT
-    private final JwtService jwtService;
+    private final JwtTokenService jwtService;
 
     // Service for loading users by email/username
-    private final CustomUserDetailsService userDetailsService;
+    private final AuthUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtService jwtService,
-                                   CustomUserDetailsService userDetailsService) {
+    public JwtAuthFilter(JwtTokenService jwtService,
+                         AuthUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }

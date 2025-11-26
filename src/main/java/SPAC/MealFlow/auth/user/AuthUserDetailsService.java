@@ -1,4 +1,4 @@
-package SPAC.MealFlow.security;
+package SPAC.MealFlow.auth.user;
 
 import SPAC.MealFlow.user.model.User;
 import SPAC.MealFlow.user.repository.UserRepository;
@@ -8,12 +8,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class AuthUserDetailsService implements UserDetailsService {
 
     // Repository for loading users
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public AuthUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -24,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return new CustomUserDetails(user);
+        return new AuthUserDetails(user);
     }
 }
