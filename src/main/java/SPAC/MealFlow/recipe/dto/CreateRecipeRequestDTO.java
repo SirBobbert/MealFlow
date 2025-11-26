@@ -1,15 +1,13 @@
 package SPAC.MealFlow.recipe.dto;
 
-import SPAC.MealFlow.recipe.model.RecipeIngredient;
-
 import java.util.List;
 
-public record RecipeCreateRequestDTO(
+public record CreateRecipeRequestDTO(
         String title,
         String description,
         String instructions,
         int servings,
         int prepTime,
-        List<RecipeIngredientCreateRequestDTO> ingredients
+        List<CreateRecipeIngredientRequestDTO> ingredients
 ) {
 }

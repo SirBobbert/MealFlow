@@ -33,7 +33,7 @@ public class RecipeController {
 
 
     @PostMapping
-    public ResponseEntity<CreateRecipeResponseDTO> createRecipe(@RequestBody RecipeCreateRequestDTO request) {
+    public ResponseEntity<CreateRecipeResponseDTO> createRecipe(@RequestBody CreateRecipeRequestDTO request) {
 
         // Get current authenticated user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -100,6 +100,25 @@ public class RecipeController {
                 .body(response);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<GetSingleRecipeResponseDTO> getRecipeById(@PathVariable int id) {
+
+        GetSingleRecipeResponseDTO recipe = recipeService.getRecipeById(id);
+
+        GetSingleRecipeResponseDTO response = new GetSingleRecipeResponseDTO(
+                recipe.id(),
+                recipe.title(),
+                recipe.description(),
+                recipe.servings(),
+                recipe.prepTime(),
+                recipe.instructions()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
+
     @GetMapping
     public ResponseEntity<GetAllRecipesResponseDTO> getAllRecipes() {
 
@@ -108,7 +127,7 @@ public class RecipeController {
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
 
-        List<GetAllRecipesRecipeDTO> recipes =
+        List<GetAllRecipesRequestDTO> recipes =
                 recipeService.getAllUserRecipes(currentUser.getId());
 
         GetAllRecipesResponseDTO response = new GetAllRecipesResponseDTO(recipes);
@@ -119,17 +138,14 @@ public class RecipeController {
     }
 
 
-
     @PatchMapping("/{id}")
     public ResponseEntity<CreateRecipeResponseDTO> updateRecipe(
             @PathVariable int id,
-            @RequestBody RecipeCreateRequestDTO request) {
+            @RequestBody CreateRecipeRequestDTO request) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
         User currentUser = principal.getUser();
-
-        System.out.println(">>> updateRecipe called with id = " + id);
 
         Recipe updated = recipeService.updateRecipe(id, currentUser, request);
 
@@ -155,10 +171,30 @@ public class RecipeController {
                 ingredientResponses
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<DeleteRecipeResponseDTO> deleteRecipe(@PathVariable int id) {
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
+        User currentUser = principal.getUser();
+
+        Recipe deleted = recipeService.deleteRecipe(id, currentUser);
+
+        DeleteRecipeResponseDTO response = new DeleteRecipeResponseDTO(
+                deleted.getId(),
+                deleted.getTitle(),
+                "Recipe was deleted successfully"
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
 
 
 }

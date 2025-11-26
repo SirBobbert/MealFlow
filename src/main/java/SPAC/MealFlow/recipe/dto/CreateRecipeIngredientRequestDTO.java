@@ -1,6 +1,6 @@
 package SPAC.MealFlow.recipe.dto;
 
-public record RecipeIngredientCreateRequestDTO(
+public record CreateRecipeIngredientRequestDTO(
         int ingredientId,
         int amount,
         String unit

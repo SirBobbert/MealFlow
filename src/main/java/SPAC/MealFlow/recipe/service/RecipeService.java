@@ -2,8 +2,9 @@ package SPAC.MealFlow.recipe.service;
 
 import SPAC.MealFlow.common.exceptions.IngredientNotFoundException;
 import SPAC.MealFlow.common.exceptions.RecipeNotFoundException;
-import SPAC.MealFlow.recipe.dto.GetAllRecipesRecipeDTO;
-import SPAC.MealFlow.recipe.dto.RecipeCreateRequestDTO;
+import SPAC.MealFlow.recipe.dto.GetAllRecipesRequestDTO;
+import SPAC.MealFlow.recipe.dto.CreateRecipeRequestDTO;
+import SPAC.MealFlow.recipe.dto.GetSingleRecipeResponseDTO;
 import SPAC.MealFlow.recipe.model.Ingredient;
 import SPAC.MealFlow.recipe.model.Recipe;
 import SPAC.MealFlow.recipe.model.RecipeIngredient;
@@ -47,26 +48,48 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
-    public List<GetAllRecipesRecipeDTO> getAllUserRecipes(int userId) {
+    // Service
+    public GetSingleRecipeResponseDTO getRecipeById(int id) {
+
+        // Load entity or throw 404-style exception
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() ->
+                        new RecipeNotFoundException("Recipe with ID " + id + " not found")
+                );
+
+        // Map entity -> response DTO
+        return new GetSingleRecipeResponseDTO(
+                recipe.getId(),
+                recipe.getTitle(),
+                recipe.getDescription(),
+                recipe.getServings(),
+                recipe.getPrepTime(),
+                recipe.getInstructions()
+        );
+    }
+
+
+    public List<GetAllRecipesRequestDTO> getAllUserRecipes(int userId) {
 
         // load all Recipe entities for this user
         List<Recipe> recipes = recipeRepository.findAllByUserId(userId);
 
         // map entities to DTOs
         return recipes.stream()
-                .map(r -> new GetAllRecipesRecipeDTO(
+                .map(r -> new GetAllRecipesRequestDTO(
                         r.getId(),
                         r.getTitle(),
                         r.getDescription(),
                         r.getServings(),
-                        r.getPrepTime()
+                        r.getPrepTime(),
+                        r.getInstructions()
 
                 ))
                 .toList();
     }
 
     @Transactional
-    public Recipe updateRecipe(int id, User currentUser, RecipeCreateRequestDTO request) {
+    public Recipe updateRecipe(int id, User currentUser, CreateRecipeRequestDTO request) {
 
         // Load existing recipe
         Recipe recipe = recipeRepository.findById(id)
@@ -107,5 +130,21 @@ public class RecipeService {
         // Persist
         return recipeRepository.save(recipe);
     }
+
+    public Recipe deleteRecipe(int id, User currentUser) {
+
+        // find existing recipe
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
+
+        // only owner can delete
+        if (recipe.getUser().getId() != currentUser.getId()) {
+            throw new RecipeNotFoundException("Recipe with ID " + id + " not found for this user");
+        }
+
+        recipeRepository.delete(recipe);
+        return recipe;
+    }
+
 
 }

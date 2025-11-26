@@ -1,10 +1,11 @@
 package SPAC.MealFlow.recipe.dto;
 
-public record GetAllRecipesRecipeDTO(
+public record GetAllRecipesRequestDTO(
         int id,
         String title,
         String description,
         int servings,
-        int prepTime
+        int prepTime,
+        String instructions
 ) { }
 
