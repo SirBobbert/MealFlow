@@ -108,7 +108,8 @@ public class RecipeController {
                 recipe.description(),
                 recipe.servings(),
                 recipe.prepTime(),
-                recipe.instructions()
+                recipe.instructions(),
+                recipe.ingredients()
         );
 
         return ResponseEntity

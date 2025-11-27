@@ -59,14 +59,26 @@ public class RecipeService {
                         new RecipeNotFoundException("Recipe with ID " + id + " not found")
                 );
 
-        // map entity to response DTO
+        // map recipe ingredients -> DTOs
+        List<CreateRecipeIngredientResponseDTO> ingredientDTOs =
+                recipe.getRecipeIngredients().stream()
+                        .map(ri -> new CreateRecipeIngredientResponseDTO(
+                                ri.getIngredient().getId(),
+                                ri.getIngredient().getName(),
+                                ri.getAmount(),
+                                ri.getUnit()
+                        ))
+                        .toList();
+
+        // map entity to response DTO including ingredients
         return new GetSingleRecipeResponseDTO(
                 recipe.getId(),
                 recipe.getTitle(),
                 recipe.getDescription(),
                 recipe.getServings(),
                 recipe.getPrepTime(),
-                recipe.getInstructions()
+                recipe.getInstructions(),
+                ingredientDTOs
         );
     }
 
