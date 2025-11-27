@@ -67,6 +67,13 @@ public class AuthSecurityConfig {
                 // (this will include /api/users/{userId}/recipes if that is your mapping)
                 .requestMatchers("/api/users/**").authenticated()
 
+
+                .requestMatchers(HttpMethod.GET, "/api/ingredients/**")
+                .hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/ingredients/**")
+                .hasAnyRole("USER", "ADMIN")
+
+
                 // Everything else requires authentication
                 .anyRequest().authenticated()
         );

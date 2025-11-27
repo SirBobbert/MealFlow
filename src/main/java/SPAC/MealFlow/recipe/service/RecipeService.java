@@ -5,6 +5,7 @@ import SPAC.MealFlow.common.exceptions.RecipeNotFoundException;
 import SPAC.MealFlow.recipe.dto.GetAllRecipesRequestDTO;
 import SPAC.MealFlow.recipe.dto.CreateRecipeRequestDTO;
 import SPAC.MealFlow.recipe.dto.GetSingleRecipeResponseDTO;
+import SPAC.MealFlow.recipe.dto.CreateRecipeIngredientResponseDTO;
 import SPAC.MealFlow.recipe.model.Ingredient;
 import SPAC.MealFlow.recipe.model.Recipe;
 import SPAC.MealFlow.recipe.model.RecipeIngredient;
@@ -31,6 +32,7 @@ public class RecipeService {
         this.ingredientRepository = ingredientRepository;
     }
 
+    // Create new recipe
     public Recipe createRecipe(Recipe recipe) {
 
         // check if ingredients exist
@@ -48,6 +50,7 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    // Get single recipe by id - currently without ingredients
     public GetSingleRecipeResponseDTO getRecipeById(int id) {
 
         // load entity
@@ -67,7 +70,7 @@ public class RecipeService {
         );
     }
 
-
+    // Get all recipes for a specific user - now including ingredients
     public List<GetAllRecipesRequestDTO> getAllUserRecipes(int userId) {
 
         // load all recipe entities for this user
@@ -75,22 +78,37 @@ public class RecipeService {
 
         // map entities to DTOs
         return recipes.stream()
-                .map(r -> new GetAllRecipesRequestDTO(
-                        r.getId(),
-                        r.getTitle(),
-                        r.getDescription(),
-                        r.getServings(),
-                        r.getPrepTime(),
-                        r.getInstructions()
+                .map(r -> {
 
-                ))
+                    // map recipe ingredients -> DTOs
+                    List<CreateRecipeIngredientResponseDTO> ingredientDTOs =
+                            r.getRecipeIngredients().stream()
+                                    .map(ri -> new CreateRecipeIngredientResponseDTO(
+                                            ri.getIngredient().getId(),
+                                            ri.getIngredient().getName(),
+                                            ri.getAmount(),
+                                            ri.getUnit()
+                                    ))
+                                    .toList();
+
+                    // build recipe DTO including ingredients
+                    return new GetAllRecipesRequestDTO(
+                            r.getId(),
+                            r.getTitle(),
+                            r.getDescription(),
+                            r.getServings(),
+                            r.getPrepTime(),
+                            r.getInstructions(),
+                            ingredientDTOs
+                    );
+                })
                 .toList();
     }
 
     @Transactional
     public Recipe updateRecipe(int id, User currentUser, CreateRecipeRequestDTO request) {
 
-        // oad existing recipe
+        // load existing recipe
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
@@ -105,6 +123,7 @@ public class RecipeService {
         recipe.setServings(request.servings());
         recipe.setPrepTime(request.prepTime());
 
+        // clear old ingredients
         recipe.getRecipeIngredients().clear();
 
         // rebuild ingredients
