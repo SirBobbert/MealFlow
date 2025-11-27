@@ -7,6 +7,7 @@ import SPAC.MealFlow.auth.user.AuthUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class AuthSecurityConfig {
@@ -38,6 +44,9 @@ public class AuthSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        // Enable CORS so frontend at http://localhost:5173 can call the API
+        http.cors(Customizer.withDefaults());
+
         // Disable CSRF for token based API
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -48,21 +57,15 @@ public class AuthSecurityConfig {
 
         // Configure which endpoints are public and which require auth
         http.authorizeHttpRequests(auth -> auth
-                // Auth endpoints (login etc.) public
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                // Login endpoint public (matches your Postman call)
+                .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
 
-                // User registration or similar public
-                .requestMatchers("/api/users/**").permitAll()
+                // Example: user registration public (adjust to your real endpoints)
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
-                // Recipe endpoints protected
-                .requestMatchers(HttpMethod.GET, "/api/recipes/**")
-                .hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/recipes/**")
-                .hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.PATCH, "/api/recipes/**")
-                .hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/recipes/**")
-                .hasAnyRole("USER", "ADMIN")
+                // Everything under /api/users/** else requires auth
+                // (this will include /api/users/{userId}/recipes if that is your mapping)
+                .requestMatchers("/api/users/**").authenticated()
 
                 // Everything else requires authentication
                 .anyRequest().authenticated()
@@ -78,6 +81,44 @@ public class AuthSecurityConfig {
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        // CORS config for Vite dev server
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Allow cookies/authorization header
+        config.setAllowCredentials(true);
+
+        // Allowed origins (Vite dev server)
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
+        ));
+
+        // Allowed HTTP methods
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+
+        // Allowed headers
+        config.setAllowedHeaders(List.of(
+                "Authorization", "Content-Type", "Accept"
+        ));
+
+        // Headers that the browser is allowed to read
+        config.setExposedHeaders(List.of(
+                "Authorization"
+        ));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        // Apply this CORS config to all endpoints
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     @Bean
