@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 public record CreateRecipeResponseDTO(
-        int id,
         int userId,
         String title,
         String description,

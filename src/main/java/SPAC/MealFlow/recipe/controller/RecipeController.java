@@ -81,7 +81,6 @@ public class RecipeController {
                 .toList();
 
         CreateRecipeResponseDTO response = new CreateRecipeResponseDTO(
-                created.getId(),
                 created.getUser().getId(),
                 created.getTitle(),
                 created.getDescription(),
@@ -158,7 +157,6 @@ public class RecipeController {
                         .toList(); 
 
         CreateRecipeResponseDTO response = new CreateRecipeResponseDTO(
-                updated.getId(),
                 updated.getUser().getId(),
                 updated.getTitle(),
                 updated.getDescription(),
