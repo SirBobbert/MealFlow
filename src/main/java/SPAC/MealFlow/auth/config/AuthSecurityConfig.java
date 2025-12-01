@@ -58,14 +58,10 @@ public class AuthSecurityConfig {
         // Configure which endpoints are public and which require auth
         http.authorizeHttpRequests(auth -> auth
                 // Login endpoint public (matches your Postman call)
-                .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
 
-                // Example: user registration public (adjust to your real endpoints)
-                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-
-                // Everything under /api/users/** else requires auth
                 // (this will include /api/users/{userId}/recipes if that is your mapping)
-                .requestMatchers("/api/users/**").authenticated()
+                .requestMatchers("/api/recipes/**").authenticated()
 
 
                 .requestMatchers(HttpMethod.GET, "/api/ingredients/**")
