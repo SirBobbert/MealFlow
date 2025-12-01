@@ -44,7 +44,7 @@ public class AuthSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // Enable CORS so frontend at http://localhost:5173 can call the API
+        // Enable CORS so frontend at http://localhost:5173/5174 can call the API
         http.cors(Customizer.withDefaults());
 
         // Disable CSRF for token based API
@@ -57,23 +57,22 @@ public class AuthSecurityConfig {
 
         // Configure which endpoints are public and which require auth
         http.authorizeHttpRequests(auth -> auth
-                // Login endpoint public (matches your Postman call)
+                // Login and user creation endpoints public
                 .requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
 
-                // (this will include /api/users/{userId}/recipes if that is your mapping)
+                // Recipes require authentication
                 .requestMatchers("/api/recipes/**").authenticated()
-
 
                 .requestMatchers(HttpMethod.GET, "/api/ingredients/**")
                 .hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/ingredients/**")
                 .hasAnyRole("USER", "ADMIN")
 
-
                 .requestMatchers(HttpMethod.POST, "/api/mealplan/**")
                 .hasAnyRole("USER", "ADMIN")
 
-
+                // Allow preflight CORS requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // Everything else requires authentication
                 .anyRequest().authenticated()
@@ -100,10 +99,12 @@ public class AuthSecurityConfig {
         // Allow cookies/authorization header
         config.setAllowCredentials(true);
 
-        // Allowed origins (Vite dev server)
+        // Allowed origins (Vite dev server - ports 5173 and 5174)
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://127.0.0.1:5173"
+                "http://127.0.0.1:5173",
+                "http://localhost:5174",
+                "http://127.0.0.1:5174"
         ));
 
         // Allowed HTTP methods
