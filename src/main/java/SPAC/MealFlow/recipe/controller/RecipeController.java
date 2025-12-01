@@ -174,25 +174,25 @@ public class RecipeController {
                 .body(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecipe(@PathVariable int id) {
+        @DeleteMapping("/{id}")
+        public ResponseEntity<?> deleteRecipe(@PathVariable int id) {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
-        User currentUser = principal.getUser();
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            AuthUserDetails principal = (AuthUserDetails) auth.getPrincipal();
+            User currentUser = principal.getUser();
 
-        Recipe deleted = recipeService.deleteRecipe(id, currentUser);
+            Recipe deleted = recipeService.deleteRecipe(id, currentUser);
 
-        DeleteRecipeResponseDTO response = new DeleteRecipeResponseDTO(
-                deleted.getId(),
-                deleted.getTitle(),
-                "Recipe was deleted successfully"
-        );
+            DeleteRecipeResponseDTO response = new DeleteRecipeResponseDTO(
+                    deleted.getId(),
+                    deleted.getTitle(),
+                    "Recipe was deleted successfully"
+            );
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
-    }
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(response);
+        }
 
 
 }

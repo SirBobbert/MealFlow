@@ -169,9 +169,16 @@ public class RecipeService {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
 
+
         // only owner can delete
         if (recipe.getUser().getId() != currentUser.getId()) {
             throw new RecipeNotFoundException("Recipe with ID " + id + " not found for this user");
+        }
+
+        if (!recipe.getMealPlanEntries().isEmpty()) {
+            throw new RuntimeException(
+                    "Cannot delete recipe because it is used in one or more meal plans"
+            );
         }
 
         recipeRepository.delete(recipe);

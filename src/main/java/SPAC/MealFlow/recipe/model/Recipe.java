@@ -69,5 +69,5 @@ public class Recipe {
 
     // meal plan entries that use this recipe
     @OneToMany(mappedBy = "recipe")
-    private List<MealPlanEntries> mealPlanEntries;
+    private List<MealPlanEntries> mealPlanEntries = new ArrayList<>();
 }
