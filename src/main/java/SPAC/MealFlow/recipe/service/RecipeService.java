@@ -50,6 +50,11 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    public Recipe getRecipeEntityById(int id) {
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new RecipeNotFoundException("Recipe with ID " + id + " not found"));
+    }
+
     // Get single recipe by id - currently without ingredients
     public GetSingleRecipeResponseDTO getRecipeById(int id) {
 

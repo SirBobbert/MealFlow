@@ -5,22 +5,31 @@ import SPAC.MealFlow.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 public class Recipe {
 
+    // primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private int id;
 
     // owner of this recipe
@@ -28,13 +37,26 @@ public class Recipe {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // recipe title
+    @ToString.Include
     private String title;
-    private String description;
-    private String instructions;
-    private int servings;
-    private int prepTime; // minutes
 
+    // short description
+    private String description;
+
+    // full instructions text
+    private String instructions;
+
+    // default servings for this recipe
+    private int servings;
+
+    // preparation time in minutes
+    private int prepTime;
+
+    // creation timestamp
     private Date createdAt;
+
+    // last update timestamp
     private Date updatedAt;
 
     // ingredients for this recipe

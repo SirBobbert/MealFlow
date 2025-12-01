@@ -74,6 +74,11 @@ public class AuthSecurityConfig {
                 .hasAnyRole("USER", "ADMIN")
 
 
+                .requestMatchers(HttpMethod.POST, "/api/mealplan/**")
+                .hasAnyRole("USER", "ADMIN")
+
+
+
                 // Everything else requires authentication
                 .anyRequest().authenticated()
         );

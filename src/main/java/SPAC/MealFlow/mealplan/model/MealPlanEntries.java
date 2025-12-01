@@ -1,22 +1,15 @@
 package SPAC.MealFlow.mealplan.model;
 
 import SPAC.MealFlow.recipe.model.Recipe;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.DayOfWeek;
 import java.util.Date;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -45,6 +38,10 @@ public class MealPlanEntries {
 
     // override servings for this entry, if needed
     private int servingsOverride;
+
+    // which day of week this entry is for
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
 
     public enum MealType {
         BREAKFAST,

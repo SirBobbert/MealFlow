@@ -27,7 +27,7 @@ public class IngredientController {
                 .toList();
     }
 
-    // Create ingredient if it does not already exist by name
+    // create ingredient if it does not already exist by name
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public IngredientResponseDTO createIngredient(@RequestBody IngredientCreateRequestDTO request) {

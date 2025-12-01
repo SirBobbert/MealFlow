@@ -5,16 +5,22 @@ import SPAC.MealFlow.recipe.model.Recipe;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Entity
 @Table(
         name = "user",
@@ -24,17 +30,26 @@ import java.util.List;
 )
 public class User {
 
+    // primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private int id;
 
+    // display name
+    @ToString.Include
     private String name;
+
+    // unique email identifier
     @Column(nullable = false, unique = true)
+    @ToString.Include
     private String email;
 
-    // store hashed password here
+    // hashed password
     private String password;
 
+    // creation timestamp
     private Date createdAt;
 
     // role for this user
