@@ -1,0 +1,73 @@
+@startuml
+class SPAC.MealFlow.auth.config.AuthSecurityConfig {
+- JwtAuthFilter jwtAuthFilter
+- AuthUserDetailsService userDetailsService
+- RestAuthenticationEntryPoint restAuthenticationEntryPoint
+- RestAccessDeniedHandler restAccessDeniedHandler
++ <<Create>> AuthSecurityConfig(JwtAuthFilter,AuthUserDetailsService,RestAuthenticationEntryPoint,RestAccessDeniedHandler)
++ SecurityFilterChain securityFilterChain(HttpSecurity)
++ CorsConfigurationSource corsConfigurationSource()
++ PasswordEncoder passwordEncoder()
+}
+
+
+class SPAC.MealFlow.auth.handler.RestAuthenticationEntryPoint {
+- ObjectMapper objectMapper
++ void commence(HttpServletRequest,HttpServletResponse,AuthenticationException)
+}
+
+
+class SPAC.MealFlow.auth.user.AuthUserDetails {
+- User user
++ <<Create>> AuthUserDetails(User)
++ User getUser()
++ Collection<? extends GrantedAuthority> getAuthorities()
++ String getPassword()
++ String getUsername()
++ boolean isAccountNonExpired()
++ boolean isAccountNonLocked()
++ boolean isCredentialsNonExpired()
++ boolean isEnabled()
+}
+
+
+class SPAC.MealFlow.auth.handler.RestAccessDeniedHandler {
+- ObjectMapper objectMapper
++ void handle(HttpServletRequest,HttpServletResponse,AccessDeniedException)
+}
+
+
+class SPAC.MealFlow.auth.jwt.JwtTokenService {
+- Key secretKey
+- long expirationMs
++ String extractUsername(String)
++ T extractClaim(String,Function<Claims,T>)
++ String generateToken(UserDetails)
++ boolean isTokenValid(String,UserDetails)
+- boolean isTokenExpired(String)
+}
+
+
+class SPAC.MealFlow.auth.jwt.JwtAuthFilter {
+- JwtTokenService jwtService
+- AuthUserDetailsService userDetailsService
++ <<Create>> JwtAuthFilter(JwtTokenService,AuthUserDetailsService)
+# void doFilterInternal(HttpServletRequest,HttpServletResponse,FilterChain)
+}
+
+
+class SPAC.MealFlow.auth.user.AuthUserDetailsService {
+- UserRepository userRepository
++ <<Create>> AuthUserDetailsService(UserRepository)
++ UserDetails loadUserByUsername(String)
+}
+
+
+
+
+org.springframework.security.web.AuthenticationEntryPoint <|.. SPAC.MealFlow.auth.handler.RestAuthenticationEntryPoint
+org.springframework.security.core.userdetails.UserDetails <|.. SPAC.MealFlow.auth.user.AuthUserDetails
+org.springframework.security.web.access.AccessDeniedHandler <|.. SPAC.MealFlow.auth.handler.RestAccessDeniedHandler
+org.springframework.web.filter.OncePerRequestFilter <|-- SPAC.MealFlow.auth.jwt.JwtAuthFilter
+org.springframework.security.core.userdetails.UserDetailsService <|.. SPAC.MealFlow.auth.user.AuthUserDetailsService
+@enduml
