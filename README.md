@@ -4,10 +4,12 @@ Backend for a personal meal planning and shopping list app.
 
 MealFlow lets you:
 
-* Create and manage recipes
-* Build meal plans
-* Generate shopping lists from your meal plans
-* Secure everything behind JWT based authentication
+* Create and manage recipes with ingredients, units, and instructions
+* Build weekly meal plans (breakfast, lunch, dinner)
+* Automatically generate shopping lists from meal plans
+* Combine ingredient amounts across recipes (aggregation)
+* Scale servings per meal entry
+* Secure everything with JWT authentication
 
 > Status: Work in progress / learning project
 
@@ -16,7 +18,8 @@ MealFlow lets you:
 ## Table of Contents
 
 * [Tech Stack](#tech-stack)
-* [Features](#features)
+* [Core Functionality](#core-functionality)
+* [User Stories](#user-stories)
 * [Architecture](#architecture)
 * [Getting Started](#getting-started)
 
@@ -29,9 +32,10 @@ MealFlow lets you:
 
   * [Auth](#auth)
   * [Recipes](#recipes)
-  * [Meal plans](#meal-plans)
-  * [Shopping lists](#shopping-lists)
-* [Development Notes](#development-notes)
+  * [Meal Plans](#meal-plans)
+  * [Meal Plan Entries](#meal-plan-entries)
+  * [Shopping Lists](#shopping-lists)
+* [Frontend Overview](#frontend-overview)
 * [Roadmap](#roadmap)
 * [License](#license)
 
@@ -39,50 +43,62 @@ MealFlow lets you:
 
 ## Tech Stack
 
-* Java (Spring Boot)
-* Maven
+* Java 17+
+* Spring Boot
 * Spring Web
 * Spring Data JPA (Hibernate)
 * Spring Security with JWT
-* MySQL
+* MySQL 8
+* Maven
 * Lombok
 
 ---
 
-## Features
+## Core Functionality
 
-* User registration and login with JWT
-* Recipe CRUD
+* Store recipes including ingredients, units, and amounts
 
-  * Ingredients connected to recipes
-  * Categories for ingredients
-* Meal plans
+* Create weekly meal plans with date + meal type
 
-  * Link recipes to days and meal types
-  * Per entry serving overrides
-* Shopping list generation
+* Automatically build shopping lists from meal plans
 
-  * Build a shopping list from a meal plan
-  * Aggregate ingredient amounts across all recipes in the plan
-* Basic error handling and validation
+* Aggregate duplicate ingredient amounts (e.g. 300 g + 200 g chicken)
+
+* Scale servings per meal entry
+
+---
+
+## User Stories
+
+* I can register, log in, and log out
+* I can create, edit, and delete recipes
+* I can add ingredients:
+
+  * Name
+  * Amount and unit (e.g. 500 g, 2 pcs)
+* I can build a weekly meal plan:
+
+  * Select dates and meal types (BREAKFAST, LUNCH, DINNER)
+  * Select recipes
+  * Override servings per entry
+* I can generate a shopping list that:
+
+  * Collects all needed ingredients
+  * Sums duplicate amounts
 
 ---
 
 ## Architecture
 
-Typical Spring Boot layered architecture:
+Layered Spring Boot backend:
 
-* `controller` packages expose REST endpoints
-* `service` packages handle business logic
-* `repository` packages use Spring Data JPA to talk to MySQL
-* `model` packages contain JPA entities
-* `auth` packages handle:
+* `controller` – REST endpoints
+* `service` – core business logic
+* `repository` – database access via JPA
+* `model` – JPA entities
+* `auth` – security, JWT filter, user details, CORS rules
 
-  * JWT filter and token validation
-  * User details
-  * Security configuration and CORS
-
-The backend is designed to be consumed by a separate frontend (for example a React app running on `http://localhost:5174`).
+Backend is designed for use with a separate frontend (e.g. React on `http://localhost:5174`).
 
 ---
 
@@ -90,11 +106,9 @@ The backend is designed to be consumed by a separate frontend (for example a Rea
 
 ### Prerequisites
 
-You need:
-
 * Java 17 or newer
 * Maven
-* MySQL 8 (or compatible)
+* MySQL
 * Git
 
 ### Clone and build
@@ -102,8 +116,6 @@ You need:
 ```bash
 git clone https://github.com/SirBobbert/MealFlow.git
 cd MealFlow
-
-# optional: run tests and build
 ./mvnw clean verify
 ```
 
@@ -115,37 +127,27 @@ mvnw.cmd clean verify
 
 ### Database setup
 
-Create a database in MySQL, for example:
-
 ```sql
 CREATE DATABASE mealflow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-Make sure you have a user with access to that database.
-
-There is a SQL seed script under `src/main/resources/sql_scripts` (for example for users, ingredients, sample recipes).
-You can run it manually or wire it into your local setup as you prefer.
+Seed scripts exist in `src/main/resources/sql_scripts`.
 
 ### Configuration
 
-Configure your connection and security settings in `application.properties` or `application.yml`.
-
-Typical properties to set:
+Set DB + JWT config inside `application.properties`:
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/mealflow
 spring.datasource.username=YOUR_USER
 spring.datasource.password=YOUR_PASSWORD
-
 spring.jpa.hibernate.ddl-auto=update
 
-# JWT config (property names may differ, check the code)
 jwt.secret=change-me
 jwt.expiration-ms=3600000
 ```
 
-Make sure the CORS configuration in the security config allows your frontend origin
-(for example `http://localhost:5174`).
+Make sure CORS allows your frontend domain.
 
 ### Run the app
 
@@ -153,7 +155,7 @@ Make sure the CORS configuration in the security config allows your frontend ori
 ./mvnw spring-boot:run
 ```
 
-The backend will usually start on:
+Backend defaults to:
 
 * `http://localhost:8080`
 
@@ -161,107 +163,111 @@ The backend will usually start on:
 
 ## API Overview
 
-This is a high level overview. The exact request and response shapes are defined in the DTO classes under `src/main/java/.../dto`.
+DTO request/response types are defined under `src/main/java/.../dto`.
+
+---
 
 ### Auth
 
-* `POST /api/users/register`
-  Register a new user.
+* `POST /api/auth/register`
+* `POST /api/auth/login`
+* `GET /api/auth/me` (current user)
 
-* `POST /api/users/login`
-  Authenticate and receive a JWT token in the response body.
-  You need to send the token as a `Bearer` token in `Authorization` for protected endpoints.
+---
 
 ### Recipes
 
 * `GET /api/recipes`
-  List all recipes for the current user or globally (depends on implementation).
-
-* `GET /api/recipes/{id}`
-  Get a single recipe including its ingredients.
-
 * `POST /api/recipes`
-  Create a new recipe with ingredients.
-
+* `GET /api/recipes/{id}`
 * `PUT /api/recipes/{id}`
-  Update an existing recipe.
-
 * `DELETE /api/recipes/{id}`
-  Delete a recipe.
 
-### Meal plans
-
-* `GET /api/mealplans`
-  List meal plans for the current user.
-
-* `GET /api/mealplans/{id}`
-  Get a single meal plan with its entries.
-
-* `POST /api/mealplans`
-  Create a new meal plan.
-  The request includes:
-
-  * A name for the meal plan
-  * A list of entries with:
-
-    * Recipe id
-    * Meal type (for example BREAKFAST, LUNCH, DINNER)
-    * Optional servings override
-
-* `PUT /api/mealplans/{id}`
-  Update an existing meal plan (name, entries etc).
-
-* `DELETE /api/mealplans/{id}`
-  Delete a meal plan.
-
-### Shopping lists
-
-Shopping lists are derived from meal plans.
-
-* `POST /api/mealplans/{id}/shopping-list`
-  Generate a shopping list from the meal plan with id `{id}`.
-  Ingredients across all recipes in the plan are grouped and their amounts are summed.
-  If you call this endpoint multiple times for the same meal plan,
-  the service is designed to not create duplicate list items
-  but reuse or update existing ones.
-
-* `GET /api/mealplans/{id}/shopping-list`
-  Get the shopping list items for a meal plan.
+Includes ingredient data and categories.
 
 ---
 
-## Development Notes
+### Meal Plans
 
-* Entities use Lombok for boilerplate reduction (`@Getter`, `@Setter`, `@Builder`, etc).
-* Relationships:
+* `GET /api/meal-plans?from=YYYY-MM-DD&to=YYYY-MM-DD`
+* `POST /api/meal-plans`
+* `GET /api/meal-plans/{id}`
+* `PUT /api/meal-plans/{id}`
+* `DELETE /api/meal-plans/{id}`
 
-  * `User` 1 - n `MealPlan`
-  * `MealPlan` 1 - n `MealPlanEntries`
-  * `Recipe` 1 - n `RecipeIngredient`
-  * `Ingredient` 1 - n `RecipeIngredient` and 1 - n `ShoppingListItems`
-* Some entities use `orphanRemoval = true` and cascading to keep the domain model consistent when you add or remove entries.
+Full CRUD support is planned.
 
-There are also SQL helper scripts in `src/main/resources/sql_scripts` for:
+---
 
-* Resetting tables (`TRUNCATE`)
-* Seeding users, ingredients, recipes
+### Meal Plan Entries
 
-Use them during development to quickly reset to a known state.
+* `POST /api/meal-plans/{id}/entries`
+* `PUT /api/meal-plan-entries/{id}`
+* `DELETE /api/meal-plan-entries/{id}`
+
+Each entry holds:
+
+* Recipe reference
+* Meal type
+* Servings override
+
+---
+
+### Shopping Lists
+
+* `POST /api/meal-plans/{id}/generate-shopping-list`
+
+  * Aggregates ingredient amounts
+  * Avoids duplicates if generated multiple times
+* `GET /api/meal-plans/{id}/shopping-list`
+* `PATCH /api/shopping-list-items/{id}` toggle checked
+
+---
+
+## Frontend Overview
+
+Planned web UI (React/Vite):
+
+* Login / Register
+* Recipe List (search, filters)
+* Recipe Detail (button: “Use in meal plan”)
+* Recipe Create/Edit (dynamic ingredient list)
+* Weekly Meal Plan grid (Mon–Sun, 3 meals/day)
+* Shopping List (checkboxes, sorted view)
 
 ---
 
 ## Roadmap
 
-Planned or potential improvements:
+Near-term goals:
 
-* Ingredient API implementation (with data on each ingredient from Frida food data)
-* Improved frontend
-* Tests
+* Add shopping list checkoff functionality
+
+* Full CRUD support for Ingredients (own endpoints, search, better category handling)
+
+* Full CRUD support for Meal Plans
+
+* Improved UX and frontend layout
+
+* CI pipeline and automated testing
+
+* Docker Compose for DB + backend startup
+
+* Export shopping list as PDF
+
+* Budget mode:
+
+  * Ingredient pricing
+  * Total cost per meal plan
+
+* “Use what I have” mode:
+
+  * Suggest recipes based on available ingredients
+
 * Sharing recipes between users
-* Docker support
-* Shopping list price comparison via supermarket web scraping
+
 ---
 
 ## License
 
-Licensed under the MIT License. See the [`LICENSE`](https://github.com/SirBobbert/MealFlow/blob/main/LICENSE) file for more details.
+MIT License. See [`LICENSE`](LICENSE).
