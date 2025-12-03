@@ -104,7 +104,8 @@ public class MealPlanService {
                     .createdAt(new Date())
                     .mealType(entryDTO.mealType())
                     .servingsOverride(entryDTO.servingsOverride())
-                    // .dayOfWeek(entryDTO.dayOfWeek()) // if you add it to DTO
+                    .dayOfWeek(entryDTO.dayOfWeek())
+
                     .build();
 
             mealPlan.addEntry(entry);

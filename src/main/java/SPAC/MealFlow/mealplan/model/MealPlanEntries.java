@@ -49,4 +49,6 @@ public class MealPlanEntries {
         DINNER,
         SNACK
     }
+
+
 }

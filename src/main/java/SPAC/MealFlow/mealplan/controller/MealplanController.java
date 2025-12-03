@@ -44,7 +44,9 @@ public class MealPlanController {
                         entry.getRecipe().getId(),
                         entry.getRecipe().getTitle(),
                         entry.getMealType(),
-                        entry.getServingsOverride()
+                        entry.getServingsOverride(),
+                        entry.getDayOfWeek()
+
                 ))
                 .toList();
 
@@ -106,7 +108,8 @@ public class MealPlanController {
                         entry.getRecipe().getId(),
                         entry.getRecipe().getTitle(),
                         entry.getMealType(),
-                        entry.getServingsOverride()
+                        entry.getServingsOverride(),
+                        entry.getDayOfWeek()
                 ))
                 .toList();
 
@@ -136,7 +139,8 @@ public class MealPlanController {
                             e.getRecipe().getId(),
                             e.getRecipe().getTitle(),
                             e.getMealType(),
-                            e.getServingsOverride()
+                            e.getServingsOverride(),
+                            e.getDayOfWeek()
                     ))
                     .toList();
 
