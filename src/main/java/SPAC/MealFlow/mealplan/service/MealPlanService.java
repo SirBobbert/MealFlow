@@ -112,4 +112,19 @@ public class MealPlanService {
 
         return mealplanRepository.save(mealPlan);
     }
+
+    @Transactional(readOnly = true)
+    public MealPlan fetchMealplanByIdAndUser(int id, User currentUser) {
+        if (currentUser == null) return null;
+        Integer userId = currentUser.getId();
+        Optional<MealPlan> maybe = mealplanRepository.findByIdAndUserIdWithEntriesAndRecipes(id, userId);
+        return maybe.orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MealPlan> fetchMealplansForUser(User currentUser) {
+        if (currentUser == null) return List.of();
+        return mealplanRepository.findAllByUserIdWithEntriesAndRecipes(currentUser.getId());
+    }
+
 }
